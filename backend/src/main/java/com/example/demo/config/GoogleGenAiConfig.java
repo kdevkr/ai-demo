@@ -2,7 +2,6 @@ package com.example.demo.config;
 
 import com.example.demo.config.properties.AIGoogleProperties;
 import com.google.genai.Client;
-import com.google.genai.types.ClientOptions;
 import com.google.genai.types.HttpOptions;
 import com.google.genai.types.HttpRetryOptions;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -25,18 +24,13 @@ public class GoogleGenAiConfig {
                 .baseUrl(properties.getBaseUrl())
                 .timeout(properties.getTimeout())
                 .retryOptions(HttpRetryOptions.builder()
-                        .attempts(properties.getAttempts())
+                        .attempts(properties.getMaxRetries())
                         .build())
-                .build();
-
-        ClientOptions options = ClientOptions.builder()
-                .maxConnections(properties.getMaxConnections())
                 .build();
 
         return Client.builder()
                 .apiKey(properties.getApiKey())
                 .httpOptions(httpOptions)
-                .clientOptions(options)
                 .build();
     }
 }

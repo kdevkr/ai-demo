@@ -1,16 +1,27 @@
 package com.example.demo.config.properties;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.bind.ConstructorBinding;
 
 @Getter
-@AllArgsConstructor
 @ConfigurationProperties(prefix = "ai.google")
 public class AIGoogleProperties {
+    
     private final String apiKey;
-    private final String baseUrl = "https://generativelanguage.googleapis.com";
-    private final Integer timeout = 30000;
-    private final Integer attempts = 3;
-    private final Integer maxConnections = 64;
+    private final String baseUrl;
+    private final int timeout;
+    private final int maxRetries;
+    
+    @ConstructorBinding
+    public AIGoogleProperties(
+            String apiKey,
+            String baseUrl,
+            int timeout,
+            int maxRetries) {
+        this.apiKey = apiKey;
+        this.baseUrl = baseUrl;
+        this.timeout = timeout;
+        this.maxRetries = maxRetries;
+    }
 }
