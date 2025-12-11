@@ -15,6 +15,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * Google Gemini AI Service Implementation
+ * 
+ * Model Reference: https://ai.google.dev/gemini-api/docs/models
+ */
 @Slf4j
 @Service
 public class GeminiAIService implements AIService {

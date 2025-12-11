@@ -1,8 +1,8 @@
 package com.example.demo.config;
 
-import com.example.demo.config.properties.AIOpenAIProperties;
-import com.openai.client.OpenAIClient;
-import com.openai.client.okhttp.OpenAIOkHttpClient;
+import com.anthropic.client.AnthropicClient;
+import com.anthropic.client.okhttp.AnthropicOkHttpClient;
+import com.example.demo.config.properties.AIClaudeProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,12 +10,12 @@ import org.springframework.context.annotation.Configuration;
 import java.time.Duration;
 
 @Configuration
-@EnableConfigurationProperties(AIOpenAIProperties.class)
-public class OpenAIConfig {
+@EnableConfigurationProperties(AIClaudeProperties.class)
+public class AnthropicConfig {
 
     @Bean
-    public OpenAIClient openAIClient(AIOpenAIProperties properties) {
-        return OpenAIOkHttpClient.builder()
+    public AnthropicClient anthropicClient(AIClaudeProperties properties) {
+        return AnthropicOkHttpClient.builder()
                 .apiKey(properties.getApiKey())
                 .baseUrl(properties.getBaseUrl())
                 .timeout(Duration.ofMillis(properties.getTimeout()))
