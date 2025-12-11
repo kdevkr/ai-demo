@@ -52,6 +52,8 @@ public class OpenAIService implements AIService {
     
     private final OpenAIClient client;
     
+
+    
     @Override
     public GenerateResponse generate(GenerateRequest request) {
         long startTime = System.currentTimeMillis();
@@ -66,7 +68,7 @@ public class OpenAIService implements AIService {
             ChatCompletionCreateParams.Builder paramsBuilder = ChatCompletionCreateParams.builder()
                     .model(modelId)
                     .addMessage(ChatCompletionUserMessageParam.builder()
-                            .content(ChatCompletionUserMessageParam.Content.ofText(request.getPrompt()))
+                            .content(ChatCompletionUserMessageParam.Content.ofText(getSystemInstruction() + "\n\n" + request.getPrompt()))
                             .build());
             
             if (request.getMaxTokens() != null) {

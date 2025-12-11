@@ -58,6 +58,8 @@ public class ClaudeAIService implements AIService {
     
     private final AnthropicClient client;
     
+
+    
     @Override
     public GenerateResponse generate(GenerateRequest request) {
         long startTime = System.currentTimeMillis();
@@ -71,7 +73,8 @@ public class ClaudeAIService implements AIService {
             
             MessageCreateParams.Builder paramsBuilder = MessageCreateParams.builder()
                     .model(Model.of(modelId))
-                    .maxTokens(request.getMaxTokens() != null ? request.getMaxTokens().longValue() : 1000L)
+                    .maxTokens(request.getMaxTokens() != null ? request.getMaxTokens().longValue() : getDefaultMaxTokens())
+                    .system(MessageCreateParams.System.ofString(getSystemInstruction()))
                     .addMessage(MessageParam.builder()
                             .role(MessageParam.Role.USER)
                             .content(MessageParam.Content.ofString(request.getPrompt()))

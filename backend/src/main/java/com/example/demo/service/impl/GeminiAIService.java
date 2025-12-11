@@ -50,6 +50,8 @@ public class GeminiAIService implements AIService {
 
     private final Client client;
 
+
+    
     @Override
     public GenerateResponse generate(GenerateRequest request) {
         long startTime = System.currentTimeMillis();
@@ -61,7 +63,11 @@ public class GeminiAIService implements AIService {
                 throw new ModelNotSupportedException(modelId, PROVIDER_NAME);
             }
 
-            GenerateContentConfig.Builder configBuilder = GenerateContentConfig.builder();
+            GenerateContentConfig.Builder configBuilder = GenerateContentConfig.builder()
+                    .systemInstruction(Content.builder()
+                            .role("user")
+                            .parts(List.of(Part.builder().text(getSystemInstruction()).build()))
+                            .build());
             
             if (request.getMaxTokens() != null) {
                 configBuilder.maxOutputTokens(request.getMaxTokens());
