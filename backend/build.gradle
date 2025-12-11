@@ -1,0 +1,60 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.3.5'
+    id 'io.spring.dependency-management' version '1.1.6'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    sourceCompatibility = '17'
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-logging'
+    
+    // JSON 처리
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+    
+    // HTTP 클라이언트
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    
+    // Sentry 오류 추적
+    implementation 'io.sentry:sentry-spring-boot-starter:6.34.0'
+    
+    // Loki 로깅 (Logback appender)
+    implementation 'com.github.loki4j:loki-logback-appender:1.4.2'
+    
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+    testImplementation 'org.testcontainers:junit-jupiter'
+    
+    // jqwik for property-based testing
+    testImplementation 'net.jqwik:jqwik:1.8.2'
+    testRuntimeOnly 'net.jqwik:jqwik-engine:1.8.2'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+    
+    // jqwik 설정
+    systemProperty 'jqwik.tries.default', '100'
+    systemProperty 'jqwik.reporting.usejunitplatform', 'true'
+}
