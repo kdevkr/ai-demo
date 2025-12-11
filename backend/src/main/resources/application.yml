@@ -10,7 +10,7 @@ spring:
 ai:
   google:
     api-key: ${GOOGLE_API_KEY:dummy-key}
-    base-url: ${GOOGLE_API_BASE_URL:https://generativelanguage.googleapis.com/v1beta}
+    base-url: ${GOOGLE_API_BASE_URL:https://generativelanguage.googleapis.com/}
     timeout: ${GOOGLE_API_TIMEOUT:30000}
     max-retries: ${GOOGLE_API_MAX_RETRIES:3}
     max-connections: ${GOOGLE_API_MAX_CONNECTIONS:10}

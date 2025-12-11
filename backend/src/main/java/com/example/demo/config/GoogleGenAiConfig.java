@@ -12,14 +12,8 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties(AIGoogleProperties.class)
 public class GoogleGenAiConfig {
 
-    private final AIGoogleProperties properties;
-
-    public GoogleGenAiConfig(AIGoogleProperties properties) {
-        this.properties = properties;
-    }
-
     @Bean(destroyMethod = "close")
-    public Client googleGenAiClient() {
+    public Client googleGenAiClient(AIGoogleProperties properties) {
         HttpOptions httpOptions = HttpOptions.builder()
                 .baseUrl(properties.getBaseUrl())
                 .timeout(properties.getTimeout())
