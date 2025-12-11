@@ -63,7 +63,7 @@ public class ClaudeAIService implements AIService {
         long startTime = System.currentTimeMillis();
         
         try {
-            String modelId = request.getModel() != null ? request.getModel() : "claude-4.5-sonnet-20250514";
+            String modelId = request.getModel() != null ? request.getModel() : "claude-3-haiku-20240307";
             
             if (!isModelSupported(modelId)) {
                 throw new ModelNotSupportedException(modelId, PROVIDER_NAME);

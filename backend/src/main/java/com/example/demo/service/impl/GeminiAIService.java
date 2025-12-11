@@ -10,6 +10,7 @@ import com.google.genai.Client;
 import com.google.genai.Pager;
 import com.google.genai.types.*;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,7 @@ import java.util.List;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class GeminiAIService implements AIService {
 
     private static final String PROVIDER_NAME = "Google";
@@ -39,8 +41,8 @@ public class GeminiAIService implements AIService {
                     .available(true)
                     .build(),
             ModelInfo.builder()
-                    .id("gemini-2.5-flash-light")
-                    .name("Gemini 2.5 Flash Light")
+                    .id("gemini-2.5-flash-lite")
+                    .name("Gemini 2.5 Flash Lite")
                     .provider(PROVIDER_NAME)
                     .available(true)
                     .build()
@@ -48,16 +50,12 @@ public class GeminiAIService implements AIService {
 
     private final Client client;
 
-    public GeminiAIService(Client googleGenAiClient) {
-        this.client = googleGenAiClient;
-    }
-
     @Override
     public GenerateResponse generate(GenerateRequest request) {
         long startTime = System.currentTimeMillis();
 
         try {
-            String modelId = request.getModel() != null ? request.getModel() : "gemini-2.5-flash";
+            String modelId = request.getModel() != null ? request.getModel() : "gemini-2.5-flash-lite";
 
             if (!isModelSupported(modelId)) {
                 throw new ModelNotSupportedException(modelId, PROVIDER_NAME);
