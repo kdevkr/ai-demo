@@ -4,14 +4,21 @@ server:
 spring:
   application:
     name: demo
+  main:
+    web-application-type: servlet
 
 ai:
   google:
-    api-key: ${GOOGLE_API_KEY}
+    api-key: ${GOOGLE_API_KEY:dummy-key}
     base-url: ${GOOGLE_API_BASE_URL:https://generativelanguage.googleapis.com/v1beta}
     timeout: ${GOOGLE_API_TIMEOUT:30000}
     max-retries: ${GOOGLE_API_MAX_RETRIES:3}
     max-connections: ${GOOGLE_API_MAX_CONNECTIONS:10}
+  openai:
+    api-key: ${OPENAI_API_KEY:dummy-key}
+    base-url: ${OPENAI_API_BASE_URL:https://api.openai.com/v1}
+    timeout: ${OPENAI_API_TIMEOUT:30000}
+    max-retries: ${OPENAI_API_MAX_RETRIES:3}
 
 management:
   endpoints:
@@ -24,7 +31,9 @@ management:
 
 logging:
   level:
-    com.example.demo: INFO
-    org.springframework: INFO
+    root: INFO
+    com.example.demo: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.boot: INFO
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %highlight(%-5level) %cyan(%logger{36}) - %msg%n"

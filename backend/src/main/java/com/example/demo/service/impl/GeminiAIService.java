@@ -10,7 +10,6 @@ import com.google.genai.Client;
 import com.google.genai.Pager;
 import com.google.genai.types.*;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +17,6 @@ import java.util.List;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class GeminiAIService implements AIService {
 
     private static final String PROVIDER_NAME = "Google";
@@ -44,6 +42,10 @@ public class GeminiAIService implements AIService {
     );
 
     private final Client client;
+
+    public GeminiAIService(Client googleGenAiClient) {
+        this.client = googleGenAiClient;
+    }
 
     @Override
     public GenerateResponse generate(GenerateRequest request) {

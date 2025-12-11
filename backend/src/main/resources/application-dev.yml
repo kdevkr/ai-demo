@@ -8,8 +8,8 @@ ai:
   openai:
     api-key: ${OPENAI_API_KEY:your-openai-api-key}
     base-url: https://api.openai.com/v1
-    timeout: 30s
-  
+    timeout: 30
+
 # CORS 설정
 cors:
   allowed-origins: 

@@ -1,6 +1,8 @@
 package com.example.demo.service;
 
 import com.example.demo.exception.ModelNotSupportedException;
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -8,6 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 public class AIServiceFactory {
     
@@ -28,6 +31,28 @@ public class AIServiceFactory {
                         Map.Entry::getKey,
                         Map.Entry::getValue
                 ));
+    }
+    
+    @PostConstruct
+    public void printAvailableModels() {
+        log.info("=".repeat(80));
+        log.info("사용 가능한 AI 모델 목록:");
+        log.info("=".repeat(80));
+        
+        servicesByProvider.values().stream()
+                .flatMap(service -> service.getAvailableModels().stream())
+                .forEach(model -> {
+                    log.info("  [{}] {} - {} (사용 가능: {})",
+                            model.getProvider(),
+                            model.getId(),
+                            model.getName(),
+                            model.getAvailable() ? "예" : "아니오"
+                    );
+                });
+        
+        log.info("=".repeat(80));
+        log.info("총 {} 개의 모델을 사용할 수 있습니다.", servicesByModel.size());
+        log.info("=".repeat(80));
     }
     
     public AIService getServiceByProvider(String provider) {
