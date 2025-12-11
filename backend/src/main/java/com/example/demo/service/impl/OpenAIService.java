@@ -67,8 +67,9 @@ public class OpenAIService implements AIService {
             
             ChatCompletionCreateParams.Builder paramsBuilder = ChatCompletionCreateParams.builder()
                     .model(modelId)
+                    .addSystemMessage(getSystemInstruction())
                     .addMessage(ChatCompletionUserMessageParam.builder()
-                            .content(ChatCompletionUserMessageParam.Content.ofText(getSystemInstruction() + "\n\n" + request.getPrompt()))
+                            .content(ChatCompletionUserMessageParam.Content.ofText(request.getPrompt()))
                             .build());
             
             if (request.getMaxTokens() != null) {
