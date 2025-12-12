@@ -33,6 +33,12 @@ public class OpenAIService implements AIService {
     private static final String PROVIDER_NAME = "OpenAI";
     private static final List<ModelInfo> AVAILABLE_MODELS = List.of(
             ModelInfo.builder()
+                    .id("gpt-5.2")
+                    .name("GPT-5.2")
+                    .provider(PROVIDER_NAME)
+                    .available(true)
+                    .build(),
+            ModelInfo.builder()
                     .id("gpt-5.1")
                     .name("GPT-5.1")
                     .provider(PROVIDER_NAME)
