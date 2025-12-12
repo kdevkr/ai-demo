@@ -4,7 +4,6 @@
     
     <springProperty scope="context" name="appName" source="spring.application.name" defaultValue="demo"/>
     <springProperty scope="context" name="lokiUrl" source="logging.loki.url" defaultValue="http://localhost:3100/loki/api/v1/push"/>
-    <springProperty scope="context" name="lokiEnabled" source="logging.loki.enabled" defaultValue="false"/>
     
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -38,11 +37,7 @@
     <springProfile name="dev">
         <root level="INFO">
             <appender-ref ref="CONSOLE"/>
-            <if condition='property("lokiEnabled").equals("true")'>
-                <then>
-                    <appender-ref ref="LOKI"/>
-                </then>
-            </if>
+            <appender-ref ref="LOKI"/>
         </root>
         <logger name="com.example.demo" level="DEBUG"/>
         <logger name="org.springframework.web" level="DEBUG"/>
@@ -51,11 +46,7 @@
     <springProfile name="prod">
         <root level="INFO">
             <appender-ref ref="CONSOLE"/>
-            <if condition='property("lokiEnabled").equals("true")'>
-                <then>
-                    <appender-ref ref="LOKI"/>
-                </then>
-            </if>
+            <appender-ref ref="LOKI"/>
         </root>
         <logger name="com.example.demo" level="INFO"/>
     </springProfile>

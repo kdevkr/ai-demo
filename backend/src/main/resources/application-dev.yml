@@ -6,7 +6,6 @@ sentry:
 
 logging:
   loki:
-    enabled: true
     url: http://localhost:3100/loki/api/v1/push
   level:
     com.example.demo: DEBUG
