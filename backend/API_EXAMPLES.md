@@ -64,6 +64,18 @@ curl -X POST http://localhost:8080/api/v1/ai/generate/stream \
   }'
 ```
 
+### Anthropic Claude
+```bash
+curl -X POST http://localhost:8080/api/v1/ai/generate/stream \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "claude-3-haiku-20240307",
+    "prompt": "AWS에 대해 자세히 설명해주세요",
+    "maxTokens": 1000,
+    "temperature": 0.7
+  }'
+```
+
 ### JavaScript (Fetch API)
 ```javascript
 const response = await fetch('http://localhost:8080/api/v1/ai/generate/stream', {

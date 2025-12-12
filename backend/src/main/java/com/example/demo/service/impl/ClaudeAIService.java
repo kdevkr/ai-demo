@@ -119,9 +119,51 @@ public class ClaudeAIService implements AIService {
     
     @Override
     public Flux<String> generateStream(GenerateRequest request) {
-        return Flux.error(
-            new AIServiceException("Claude 스트리밍은 현재 지원하지 않습니다", PROVIDER_NAME)
-        );
+        try {
+            String modelId = request.getModel() != null ? request.getModel() : "claude-3-haiku-20240307";
+            
+            if (!isModelSupported(modelId)) {
+                throw new ModelNotSupportedException(modelId, PROVIDER_NAME);
+            }
+            
+            MessageCreateParams.Builder paramsBuilder = MessageCreateParams.builder()
+                    .model(Model.of(modelId))
+                    .maxTokens(request.getMaxTokens() != null ? request.getMaxTokens().longValue() : getDefaultMaxTokens())
+                    .system(MessageCreateParams.System.ofString(getSystemInstruction()))
+                    .addMessage(MessageParam.builder()
+                            .role(MessageParam.Role.USER)
+                            .content(MessageParam.Content.ofString(request.getPrompt()))
+                            .build());
+            
+            if (request.getTemperature() != null) {
+                paramsBuilder.temperature(request.getTemperature());
+            }
+            
+            return Flux.create(sink -> {
+                try (var streamResponse = client.messages().createStreaming(paramsBuilder.build())) {
+                    streamResponse.stream()
+                            .flatMap(event -> event.contentBlockDelta().stream())
+                            .flatMap(deltaEvent -> deltaEvent.delta().text().stream())
+                            .forEach(textDelta -> {
+                                String text = textDelta.text();
+                                if (text != null && !text.isEmpty()) {
+                                    sink.next(text);
+                                }
+                            });
+                    sink.complete();
+                } catch (Exception e) {
+                    sink.error(new AIServiceException("Claude 스트리밍 중 오류 발생: " + e.getMessage(), e, PROVIDER_NAME));
+                }
+            });
+            
+        } catch (ModelNotSupportedException e) {
+            return Flux.error(e);
+        } catch (Exception e) {
+            log.error("Claude 스트리밍 초기화 실패", e);
+            return Flux.error(
+                new AIServiceException("Claude 스트리밍 초기화 실패: " + e.getMessage(), e, PROVIDER_NAME)
+            );
+        }
     }
     
     @Override
