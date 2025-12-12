@@ -30,7 +30,6 @@ GOOGLE_API_KEY=your-google-api-key
 OPENAI_API_KEY=your-openai-api-key
 ANTHROPIC_API_KEY=your-anthropic-api-key
 SENTRY_DSN=http://public@localhost:9000/1
-LOKI_ENABLED=true
 ```
 
 ### 2. 모니터링 스택 실행 (선택사항)
@@ -46,6 +45,22 @@ docker-compose up -d
 - 통합 가이드: `../devops/MONITORING_SETUP.md`
 - Sentry 설정: `../devops/SENTRY_SETUP.md`
 - Loki 설정: `../devops/LOKI_SETUP.md`
+
+### 3. Windows 환경 설정
+
+Windows에서 한글이 깨지는 경우:
+
+**VSCode 사용 시:**
+- `.vscode/launch.json`에 이미 UTF-8 설정이 포함되어 있습니다
+- F5를 눌러 디버그 모드로 실행하면 한글이 정상 출력됩니다
+
+**터미널에서 직접 실행 시:**
+```bash
+# PowerShell에서
+chcp 65001
+$env:JAVA_TOOL_OPTIONS="-Dfile.encoding=UTF-8"
+./gradlew bootRun --args='--spring.profiles.active=dev'
+```
 
 ## 빌드 및 실행
 
@@ -122,3 +137,7 @@ GET /api/v1/ai/health
 
 - `dev`: 개발 환경 (디버그 로그, CORS 허용)
 - `prod`: 프로덕션 환경 (최소 로그, Sentry 활성화)
+
+## 상세 API 문서
+
+자세한 API 사용 예제는 [API_EXAMPLES.md](./API_EXAMPLES.md)를 참고하세요.

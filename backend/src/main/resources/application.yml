@@ -41,6 +41,8 @@ management:
       show-details: always
 
 logging:
+  charset:
+    console: UTF-8
   loki:
     url: ${LOKI_URL:http://localhost:3100/loki/api/v1/push}
   level:
