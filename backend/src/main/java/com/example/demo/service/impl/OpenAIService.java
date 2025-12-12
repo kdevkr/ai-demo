@@ -111,9 +111,55 @@ public class OpenAIService implements AIService {
     
     @Override
     public Flux<String> generateStream(GenerateRequest request) {
-        return Flux.error(
-            new AIServiceException("OpenAI 스트리밍은 현재 지원하지 않습니다", PROVIDER_NAME)
-        );
+        try {
+            String modelId = request.getModel() != null ? request.getModel() : "gpt-3.5-turbo";
+            
+            if (!isModelSupported(modelId)) {
+                throw new ModelNotSupportedException(modelId, PROVIDER_NAME);
+            }
+            
+            ChatCompletionCreateParams.Builder paramsBuilder = ChatCompletionCreateParams.builder()
+                    .model(modelId)
+                    .addSystemMessage(getSystemInstruction())
+                    .addMessage(ChatCompletionUserMessageParam.builder()
+                            .content(ChatCompletionUserMessageParam.Content.ofText(request.getPrompt()))
+                            .build());
+            
+            if (request.getMaxTokens() != null) {
+                paramsBuilder.maxCompletionTokens(request.getMaxTokens().longValue());
+            }
+            
+            if (request.getTemperature() != null) {
+                paramsBuilder.temperature(request.getTemperature());
+            }
+            
+            return Flux.create(sink -> {
+                try (var streamResponse = client.chat().completions().createStreaming(paramsBuilder.build())) {
+                    streamResponse.stream().forEach(chunk -> {
+                        if (!chunk.choices().isEmpty()) {
+                            var delta = chunk.choices().get(0).delta();
+                            if (delta.content().isPresent()) {
+                                String text = delta.content().get();
+                                if (text != null && !text.isEmpty()) {
+                                    sink.next(text);
+                                }
+                            }
+                        }
+                    });
+                    sink.complete();
+                } catch (Exception e) {
+                    sink.error(new AIServiceException("OpenAI 스트리밍 중 오류 발생: " + e.getMessage(), e, PROVIDER_NAME));
+                }
+            });
+            
+        } catch (ModelNotSupportedException e) {
+            return Flux.error(e);
+        } catch (Exception e) {
+            log.error("OpenAI 스트리밍 초기화 실패", e);
+            return Flux.error(
+                new AIServiceException("OpenAI 스트리밍 초기화 실패: " + e.getMessage(), e, PROVIDER_NAME)
+            );
+        }
     }
     
     @Override

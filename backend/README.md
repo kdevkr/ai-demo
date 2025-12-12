@@ -94,8 +94,8 @@ Content-Type: application/json
 
 **지원 모델:**
 - Google Gemini: 모든 모델 지원
-- OpenAI: 현재 미지원
-- Claude: 현재 미지원
+- OpenAI: 모든 모델 지원
+- Anthropic Claude: 현재 미지원 (SDK 버전 호환성 문제)
 
 ### 모델 목록 조회
 ```bash

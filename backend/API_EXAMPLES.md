@@ -40,13 +40,25 @@ curl -X POST http://localhost:8080/api/v1/ai/generate \
 
 ## 2. 스트리밍 텍스트 생성
 
-### Google Gemini (지원)
+### Google Gemini
 ```bash
 curl -X POST http://localhost:8080/api/v1/ai/generate/stream \
   -H "Content-Type: application/json" \
   -d '{
     "model": "gemini-2.5-flash",
     "prompt": "Kubernetes에 대해 자세히 설명해주세요",
+    "maxTokens": 1000,
+    "temperature": 0.7
+  }'
+```
+
+### OpenAI GPT
+```bash
+curl -X POST http://localhost:8080/api/v1/ai/generate/stream \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "gpt-3.5-turbo",
+    "prompt": "Docker에 대해 자세히 설명해주세요",
     "maxTokens": 1000,
     "temperature": 0.7
   }'
