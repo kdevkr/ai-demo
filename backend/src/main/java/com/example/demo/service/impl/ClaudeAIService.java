@@ -11,6 +11,7 @@ import com.example.demo.model.GenerateRequest;
 import com.example.demo.model.GenerateResponse;
 import com.example.demo.model.ModelInfo;
 import com.example.demo.service.AIService;
+import com.example.demo.service.TokenPricingService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,6 +58,7 @@ public class ClaudeAIService implements AIService {
     );
     
     private final AnthropicClient client;
+    private final TokenPricingService pricingService;
     
 
     
@@ -93,13 +95,17 @@ public class ClaudeAIService implements AIService {
             }
             
             String generatedText = response.content().get(0).asText().text();
-            Integer tokensUsed = (int) (response.usage().inputTokens() + response.usage().outputTokens());
+            int inputTokens = (int) response.usage().inputTokens();
+            int outputTokens = (int) response.usage().outputTokens();
+            Integer tokensUsed = inputTokens + outputTokens;
+            Double cost = pricingService.calculateCost(modelId, inputTokens, outputTokens);
             
             return GenerateResponse.builder()
                     .generatedText(generatedText)
                     .model(modelId)
                     .tokensUsed(tokensUsed)
                     .processingTimeMs(processingTime)
+                    .costUsd(cost)
                     .build();
                     
         } catch (ModelNotSupportedException e) {

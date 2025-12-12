@@ -15,4 +15,5 @@ public class GenerateResponse {
     private String model;
     private Integer tokensUsed;
     private Long processingTimeMs;
+    private Double costUsd;
 }

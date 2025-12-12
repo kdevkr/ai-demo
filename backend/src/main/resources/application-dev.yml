@@ -1,4 +1,13 @@
+sentry:
+  enabled: true
+  dsn: ${SENTRY_DSN:http://public@localhost:9000/1}
+  environment: development
+  traces-sample-rate: 1.0
+
 logging:
+  loki:
+    enabled: true
+    url: http://localhost:3100/loki/api/v1/push
   level:
     com.example.demo: DEBUG
     org.springframework.web: DEBUG

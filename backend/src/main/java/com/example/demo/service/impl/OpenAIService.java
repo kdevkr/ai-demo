@@ -6,6 +6,7 @@ import com.example.demo.model.GenerateRequest;
 import com.example.demo.model.GenerateResponse;
 import com.example.demo.model.ModelInfo;
 import com.example.demo.service.AIService;
+import com.example.demo.service.TokenPricingService;
 import com.openai.client.OpenAIClient;
 import com.openai.models.chat.completions.ChatCompletion;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
@@ -51,6 +52,7 @@ public class OpenAIService implements AIService {
     );
     
     private final OpenAIClient client;
+    private final TokenPricingService pricingService;
     
 
     
@@ -85,13 +87,17 @@ public class OpenAIService implements AIService {
             long processingTime = System.currentTimeMillis() - startTime;
             
             String generatedText = completion.choices().get(0).message().content().get();
+            int inputTokens = (int) completion.usage().get().promptTokens();
+            int outputTokens = (int) completion.usage().get().completionTokens();
             Integer tokensUsed = (int) completion.usage().get().totalTokens();
+            Double cost = pricingService.calculateCost(modelId, inputTokens, outputTokens);
             
             return GenerateResponse.builder()
                     .generatedText(generatedText)
                     .model(modelId)
                     .tokensUsed(tokensUsed)
                     .processingTimeMs(processingTime)
+                    .costUsd(cost)
                     .build();
                     
         } catch (ModelNotSupportedException e) {

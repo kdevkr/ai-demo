@@ -6,6 +6,7 @@ import com.example.demo.model.GenerateRequest;
 import com.example.demo.model.GenerateResponse;
 import com.example.demo.model.ModelInfo;
 import com.example.demo.service.AIService;
+import com.example.demo.service.TokenPricingService;
 import com.google.genai.Client;
 import com.google.genai.Pager;
 import com.google.genai.types.*;
@@ -49,6 +50,7 @@ public class GeminiAIService implements AIService {
     );
 
     private final Client client;
+    private final TokenPricingService pricingService;
 
 
     
@@ -92,15 +94,21 @@ public class GeminiAIService implements AIService {
             }
 
             String generatedText = response.text();
-            Integer tokensUsed = response.usageMetadata()
-                    .flatMap(GenerateContentResponseUsageMetadata::totalTokenCount)
+            int inputTokens = response.usageMetadata()
+                    .flatMap(GenerateContentResponseUsageMetadata::promptTokenCount)
                     .orElse(0);
+            int outputTokens = response.usageMetadata()
+                    .flatMap(GenerateContentResponseUsageMetadata::candidatesTokenCount)
+                    .orElse(0);
+            Integer tokensUsed = inputTokens + outputTokens;
+            Double cost = pricingService.calculateCost(modelId, inputTokens, outputTokens);
 
             return GenerateResponse.builder()
                     .generatedText(generatedText)
                     .model(modelId)
                     .tokensUsed(tokensUsed)
                     .processingTimeMs(processingTime)
+                    .costUsd(cost)
                     .build();
 
         } catch (ModelNotSupportedException e) {

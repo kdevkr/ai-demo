@@ -25,6 +25,12 @@ ai:
     timeout: ${ANTHROPIC_API_TIMEOUT:30000}
     max-retries: ${ANTHROPIC_API_MAX_RETRIES:3}
 
+sentry:
+  dsn: ${SENTRY_DSN:}
+  environment: ${SENTRY_ENVIRONMENT:development}
+  traces-sample-rate: ${SENTRY_TRACES_SAMPLE_RATE:1.0}
+  enabled: ${SENTRY_ENABLED:false}
+
 management:
   endpoints:
     web:
@@ -35,6 +41,9 @@ management:
       show-details: always
 
 logging:
+  loki:
+    enabled: ${LOKI_ENABLED:false}
+    url: ${LOKI_URL:http://localhost:3100/loki/api/v1/push}
   level:
     root: INFO
     com.example.demo: DEBUG
