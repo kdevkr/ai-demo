@@ -8,6 +8,7 @@ import com.example.demo.model.ModelInfo;
 import com.example.demo.service.AIService;
 import com.example.demo.service.TokenPricingService;
 import com.openai.client.OpenAIClient;
+import reactor.core.publisher.Flux;
 import com.openai.models.chat.completions.ChatCompletion;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import com.openai.models.chat.completions.ChatCompletionUserMessageParam;
@@ -106,6 +107,13 @@ public class OpenAIService implements AIService {
             log.error("OpenAI API 호출 실패", e);
             throw new AIServiceException("OpenAI API 호출 중 오류가 발생했습니다: " + e.getMessage(), e, PROVIDER_NAME);
         }
+    }
+    
+    @Override
+    public Flux<String> generateStream(GenerateRequest request) {
+        return Flux.error(
+            new AIServiceException("OpenAI 스트리밍은 현재 지원하지 않습니다", PROVIDER_NAME)
+        );
     }
     
     @Override

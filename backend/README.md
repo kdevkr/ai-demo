@@ -79,6 +79,24 @@ Content-Type: application/json
 }
 ```
 
+### 스트리밍 텍스트 생성
+```bash
+POST /api/v1/ai/generate/stream
+Content-Type: application/json
+
+{
+  "model": "gemini-2.5-flash-lite",
+  "prompt": "안녕하세요",
+  "maxTokens": 1000,
+  "temperature": 0.7
+}
+```
+
+**지원 모델:**
+- Google Gemini: 모든 모델 지원
+- OpenAI: 현재 미지원
+- Claude: 현재 미지원
+
 ### 모델 목록 조회
 ```bash
 GET /api/v1/ai/models

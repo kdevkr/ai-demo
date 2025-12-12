@@ -8,6 +8,7 @@ import com.example.demo.model.ModelInfo;
 import com.example.demo.service.AIService;
 import com.example.demo.service.TokenPricingService;
 import com.google.genai.Client;
+import reactor.core.publisher.Flux;
 import com.google.genai.Pager;
 import com.google.genai.types.*;
 
@@ -116,6 +117,61 @@ public class GeminiAIService implements AIService {
         } catch (Exception e) {
             log.error("Google Gemini API 호출 실패", e);
             throw new AIServiceException("Google Gemini API 호출 중 오류가 발생했습니다: " + e.getMessage(), e, PROVIDER_NAME);
+        }
+    }
+    
+    @Override
+    public Flux<String> generateStream(GenerateRequest request) {
+        try {
+            String modelId = request.getModel() != null ? request.getModel() : "gemini-2.5-flash-lite";
+
+            if (!isModelSupported(modelId)) {
+                throw new ModelNotSupportedException(modelId, PROVIDER_NAME);
+            }
+
+            GenerateContentConfig.Builder configBuilder = GenerateContentConfig.builder()
+                    .systemInstruction(Content.builder()
+                            .role("user")
+                            .parts(List.of(Part.builder().text(getSystemInstruction()).build()))
+                            .build());
+            
+            if (request.getMaxTokens() != null) {
+                configBuilder.maxOutputTokens(request.getMaxTokens());
+            }
+            
+            if (request.getTemperature() != null) {
+                configBuilder.temperature(request.getTemperature().floatValue());
+            }
+
+            Content content = Content.builder()
+                    .role("user")
+                    .parts(List.of(Part.builder().text(request.getPrompt()).build()))
+                    .build();
+
+            return Flux.create(sink -> {
+                try {
+                    client.models.generateContentStream(modelId, List.of(content), configBuilder.build())
+                            .forEach(chunk -> {
+                                if (chunk != null && !chunk.candidates().isEmpty()) {
+                                    String text = chunk.text();
+                                    if (text != null && !text.isEmpty()) {
+                                        sink.next(text);
+                                    }
+                                }
+                            });
+                    sink.complete();
+                } catch (Exception e) {
+                    sink.error(new AIServiceException("Google Gemini 스트리밍 중 오류 발생: " + e.getMessage(), e, PROVIDER_NAME));
+                }
+            });
+
+        } catch (ModelNotSupportedException e) {
+            return Flux.error(e);
+        } catch (Exception e) {
+            log.error("Google Gemini 스트리밍 초기화 실패", e);
+            return Flux.error(
+                new AIServiceException("Google Gemini 스트리밍 초기화 실패: " + e.getMessage(), e, PROVIDER_NAME)
+            );
         }
     }
 

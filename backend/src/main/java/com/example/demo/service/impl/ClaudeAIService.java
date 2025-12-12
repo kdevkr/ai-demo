@@ -12,6 +12,7 @@ import com.example.demo.model.GenerateResponse;
 import com.example.demo.model.ModelInfo;
 import com.example.demo.service.AIService;
 import com.example.demo.service.TokenPricingService;
+import reactor.core.publisher.Flux;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -114,6 +115,13 @@ public class ClaudeAIService implements AIService {
             log.error("Claude API 호출 실패", e);
             throw new AIServiceException("Claude API 호출 중 오류가 발생했습니다: " + e.getMessage(), e, PROVIDER_NAME);
         }
+    }
+    
+    @Override
+    public Flux<String> generateStream(GenerateRequest request) {
+        return Flux.error(
+            new AIServiceException("Claude 스트리밍은 현재 지원하지 않습니다", PROVIDER_NAME)
+        );
     }
     
     @Override

@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 import java.util.Map;
@@ -55,6 +56,16 @@ public class AIController {
         List<ModelInfo> models = service.getAvailableModels();
         
         return ResponseEntity.ok(models);
+    }
+    
+    @PostMapping(value = "/generate/stream", produces = "text/event-stream")
+    public Flux<String> generateStream(@Valid @RequestBody GenerateRequest request) {
+        log.info("스트리밍 텍스트 생성 요청: model={}, prompt length={}", request.getModel(), request.getPrompt().length());
+        
+        AIService service = aiServiceFactory.getServiceByModel(request.getModel());
+        return service.generateStream(request)
+                .doOnComplete(() -> log.info("스트리밍 완료: model={}", request.getModel()))
+                .doOnError(error -> log.error("스트리밍 오류: model={}", request.getModel(), error));
     }
     
     @GetMapping("/health")
