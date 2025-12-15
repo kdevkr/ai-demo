@@ -46,14 +46,6 @@ management:
     health:
       show-details: always
 
-ai:
-  model:
-    validation:
-      enabled: ${AI_MODEL_VALIDATION_ENABLED:true}
-      verbose: ${AI_MODEL_VALIDATION_VERBOSE:false}
-    logging:
-      enabled: ${AI_MODEL_LOGGING_ENABLED:false}
-
 logging:
   charset:
     console: UTF-8
