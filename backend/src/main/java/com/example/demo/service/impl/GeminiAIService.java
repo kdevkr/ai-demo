@@ -9,8 +9,11 @@ import com.example.demo.service.AIService;
 import com.example.demo.service.TokenPricingService;
 import com.google.genai.Client;
 import reactor.core.publisher.Flux;
+
 import com.google.genai.Pager;
 import com.google.genai.types.*;
+
+import java.util.ArrayList;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -189,13 +192,26 @@ public class GeminiAIService implements AIService {
     @Override
     public boolean isHealthy() {
         try {
-            // 모델 목록 조회는 토큰을 소비하지 않음
             Pager<Model> modelsPager = client.models.list(ListModelsConfig.builder().build());
-            // Pager가 null이 아니면 API 연결이 정상
             return modelsPager != null;
         } catch (Exception e) {
             log.warn("Google Gemini 헬스체크 실패", e);
             return false;
+        }
+    }
+    
+    @Override
+    public List<String> getActualModelIds() {
+        try {
+            Pager<Model> modelsPager = client.models.list(ListModelsConfig.builder().build());
+            List<String> modelIds = new ArrayList<>();
+            for (Model model : modelsPager) {
+                model.name().ifPresent(modelIds::add);
+            }
+            return modelIds;
+        } catch (Exception e) {
+            log.warn("Google Gemini 모델 목록 조회 실패", e);
+            return List.of();
         }
     }
 

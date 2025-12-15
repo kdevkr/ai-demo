@@ -36,22 +36,18 @@ public class AIServiceFactory {
     @PostConstruct
     public void printAvailableModels() {
         log.info("=".repeat(80));
-        log.info("사용 가능한 AI 모델 목록:");
+        log.info("등록된 AI 모델 목록:");
         log.info("=".repeat(80));
         
-        servicesByProvider.values().stream()
-                .flatMap(service -> service.getAvailableModels().stream())
-                .forEach(model -> {
-                    log.info("  [{}] {} - {} (사용 가능: {})",
-                            model.getProvider(),
-                            model.getId(),
-                            model.getName(),
-                            model.getAvailable() ? "예" : "아니오"
-                    );
-                });
+        servicesByProvider.forEach((provider, service) -> {
+            List<String> modelIds = service.getAvailableModels().stream()
+                    .map(model -> model.getId())
+                    .collect(Collectors.toList());
+            log.info("[{}] {} 개 모델: {}", provider, modelIds.size(), String.join(", ", modelIds));
+        });
         
         log.info("=".repeat(80));
-        log.info("총 {} 개의 모델을 사용할 수 있습니다.", servicesByModel.size());
+        log.info("총 {} 개의 모델이 등록되었습니다.", servicesByModel.size());
         log.info("=".repeat(80));
     }
     

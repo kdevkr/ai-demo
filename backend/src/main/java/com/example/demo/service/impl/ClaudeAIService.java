@@ -14,6 +14,8 @@ import com.example.demo.service.AIService;
 import com.example.demo.service.TokenPricingService;
 import reactor.core.publisher.Flux;
 
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -180,21 +182,24 @@ public class ClaudeAIService implements AIService {
     @Override
     public boolean isHealthy() {
         try {
-            Message response = client.messages().create(
-                    MessageCreateParams.builder()
-                            .model(Model.of("claude-4.5-haiku-20250514"))
-                            .maxTokens(5L)
-                            .addMessage(MessageParam.builder()
-                                    .role(MessageParam.Role.USER)
-                                    .content(MessageParam.Content.ofString("test"))
-                                    .build())
-                            .build()
-            );
-            
-            return response != null && !response.content().isEmpty();
+            var models = client.models().list();
+            return models != null && !models.data().isEmpty();
         } catch (Exception e) {
             log.warn("Claude 헬스체크 실패", e);
             return false;
+        }
+    }
+    
+    @Override
+    public List<String> getActualModelIds() {
+        try {
+            var models = client.models().list();
+            return models.data().stream()
+                    .map(model -> model.id())
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.warn("Claude 모델 목록 조회 실패", e);
+            return List.of();
         }
     }
     

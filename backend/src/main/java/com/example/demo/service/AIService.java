@@ -25,6 +25,10 @@ public interface AIService {
     
     String getProviderName();
     
+    default List<String> getActualModelIds() {
+        return List.of();
+    }
+    
     default String getSystemInstruction() {
         return DEFAULT_SYSTEM_INSTRUCTION;
     }

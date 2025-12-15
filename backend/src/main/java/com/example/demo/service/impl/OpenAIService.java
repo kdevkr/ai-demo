@@ -9,6 +9,8 @@ import com.example.demo.service.AIService;
 import com.example.demo.service.TokenPricingService;
 import com.openai.client.OpenAIClient;
 import reactor.core.publisher.Flux;
+
+import java.util.stream.Collectors;
 import com.openai.models.chat.completions.ChatCompletion;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import com.openai.models.chat.completions.ChatCompletionUserMessageParam;
@@ -187,6 +189,19 @@ public class OpenAIService implements AIService {
         } catch (Exception e) {
             log.warn("OpenAI 헬스체크 실패", e);
             return false;
+        }
+    }
+    
+    @Override
+    public List<String> getActualModelIds() {
+        try {
+            ModelListPage models = client.models().list();
+            return models.data().stream()
+                    .map(model -> model.id())
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.warn("OpenAI 모델 목록 조회 실패", e);
+            return List.of();
         }
     }
     

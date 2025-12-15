@@ -2,7 +2,6 @@ package com.example.demo.config;
 
 import com.example.demo.config.properties.SentryProperties;
 import io.sentry.Sentry;
-import io.sentry.SentryOptions;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
