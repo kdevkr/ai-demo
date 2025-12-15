@@ -1,10 +1,10 @@
 package com.example.demo.service;
 
+import com.example.demo.config.properties.AIModelProperties;
 import com.example.demo.model.ModelInfo;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,21 +17,16 @@ import java.util.stream.Collectors;
 public class ModelValidationService {
     
     private final List<AIService> aiServices;
-    
-    @Value("${ai.model.validation.enabled:true}")
-    private boolean validationEnabled;
-    
-    @Value("${ai.model.validation.verbose:false}")
-    private boolean verboseLogging;
+    private final AIModelProperties modelProperties;
     
     @PostConstruct
     public void validateModels() {
-        if (!validationEnabled) {
+        if (!modelProperties.getValidation().isEnabled()) {
             log.info("AI 모델 검증이 비활성화되었습니다");
             return;
         }
         
-        if (verboseLogging) {
+        if (modelProperties.getValidation().isVerbose()) {
             log.info("=".repeat(80));
             log.info("AI 모델 검증 시작");
             log.info("=".repeat(80));
@@ -43,7 +38,7 @@ public class ModelValidationService {
         
         CompletableFuture.allOf(validationTasks.toArray(new CompletableFuture[0])).join();
         
-        if (verboseLogging) {
+        if (modelProperties.getValidation().isVerbose()) {
             log.info("=".repeat(80));
             log.info("AI 모델 검증 완료");
             log.info("=".repeat(80));
@@ -57,7 +52,7 @@ public class ModelValidationService {
             boolean isHealthy = service.isHealthy();
             
             if (isHealthy) {
-                if (verboseLogging) {
+                if (modelProperties.getValidation().isVerbose()) {
                     log.info("[{}] 연결 성공 - API 정상 작동", providerName);
                 }
                 validateModels(service);
@@ -80,7 +75,7 @@ public class ModelValidationService {
             return;
         }
         
-        if (verboseLogging) {
+        if (modelProperties.getValidation().isVerbose()) {
             log.info("[{}] API에서 {} 개의 모델을 발견했습니다", 
                     service.getProviderName(), 
                     actualModelIds.size());
@@ -90,7 +85,7 @@ public class ModelValidationService {
             boolean exists = actualModelIds.stream()
                     .anyMatch(id -> id.contains(model.getId()) || model.getId().contains(id));
             
-            if (verboseLogging) {
+            if (modelProperties.getValidation().isVerbose()) {
                 if (exists) {
                     log.info("[{}] ✓ 모델 확인됨: {}", service.getProviderName(), model.getId());
                 } else {

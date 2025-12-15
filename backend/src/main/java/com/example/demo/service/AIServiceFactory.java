@@ -1,9 +1,10 @@
 package com.example.demo.service;
 
+import com.example.demo.config.properties.AIModelProperties;
 import com.example.demo.exception.ModelNotSupportedException;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -13,15 +14,15 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class AIServiceFactory {
     
     private final Map<String, AIService> servicesByProvider;
     private final Map<String, AIService> servicesByModel;
+    private final AIModelProperties modelProperties;
     
-    @Value("${ai.model.logging.enabled:false}")
-    private boolean loggingEnabled;
-    
-    public AIServiceFactory(List<AIService> aiServices) {
+    public AIServiceFactory(List<AIService> aiServices, AIModelProperties modelProperties) {
+        this.modelProperties = modelProperties;
         this.servicesByProvider = aiServices.stream()
                 .collect(Collectors.toMap(
                         AIService::getProviderName,
@@ -39,7 +40,7 @@ public class AIServiceFactory {
     
     @PostConstruct
     public void printAvailableModels() {
-        if (!loggingEnabled) {
+        if (!modelProperties.getLogging().isEnabled()) {
             return;
         }
         
