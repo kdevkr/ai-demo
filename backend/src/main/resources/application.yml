@@ -8,6 +8,12 @@ spring:
     web-application-type: servlet
 
 ai:
+  model:
+    validation:
+      enabled: ${AI_MODEL_VALIDATION_ENABLED:true}
+      verbose: ${AI_MODEL_VALIDATION_VERBOSE:false}
+    logging:
+      enabled: ${AI_MODEL_LOGGING_ENABLED:false}
   google:
     api-key: ${GOOGLE_API_KEY:dummy-key}
     base-url: ${GOOGLE_API_BASE_URL:https://generativelanguage.googleapis.com/}
@@ -39,6 +45,14 @@ management:
   endpoint:
     health:
       show-details: always
+
+ai:
+  model:
+    validation:
+      enabled: ${AI_MODEL_VALIDATION_ENABLED:true}
+      verbose: ${AI_MODEL_VALIDATION_VERBOSE:false}
+    logging:
+      enabled: ${AI_MODEL_LOGGING_ENABLED:false}
 
 logging:
   charset:

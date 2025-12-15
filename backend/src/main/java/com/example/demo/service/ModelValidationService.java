@@ -4,6 +4,7 @@ import com.example.demo.model.ModelInfo;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,11 +18,24 @@ public class ModelValidationService {
     
     private final List<AIService> aiServices;
     
+    @Value("${ai.model.validation.enabled:true}")
+    private boolean validationEnabled;
+    
+    @Value("${ai.model.validation.verbose:false}")
+    private boolean verboseLogging;
+    
     @PostConstruct
     public void validateModels() {
-        log.info("=".repeat(80));
-        log.info("AI 모델 검증 시작");
-        log.info("=".repeat(80));
+        if (!validationEnabled) {
+            log.info("AI 모델 검증이 비활성화되었습니다");
+            return;
+        }
+        
+        if (verboseLogging) {
+            log.info("=".repeat(80));
+            log.info("AI 모델 검증 시작");
+            log.info("=".repeat(80));
+        }
         
         List<CompletableFuture<Void>> validationTasks = aiServices.stream()
                 .map(service -> CompletableFuture.runAsync(() -> validateService(service)))
@@ -29,9 +43,11 @@ public class ModelValidationService {
         
         CompletableFuture.allOf(validationTasks.toArray(new CompletableFuture[0])).join();
         
-        log.info("=".repeat(80));
-        log.info("AI 모델 검증 완료");
-        log.info("=".repeat(80));
+        if (verboseLogging) {
+            log.info("=".repeat(80));
+            log.info("AI 모델 검증 완료");
+            log.info("=".repeat(80));
+        }
     }
     
     private void validateService(AIService service) {
@@ -41,7 +57,9 @@ public class ModelValidationService {
             boolean isHealthy = service.isHealthy();
             
             if (isHealthy) {
-                log.info("[{}] 연결 성공 - API 정상 작동", providerName);
+                if (verboseLogging) {
+                    log.info("[{}] 연결 성공 - API 정상 작동", providerName);
+                }
                 validateModels(service);
             } else {
                 log.warn("[{}] 연결 실패 - API 키 또는 네트워크 확인 필요", providerName);
@@ -62,20 +80,26 @@ public class ModelValidationService {
             return;
         }
         
-        log.info("[{}] API에서 {} 개의 모델을 발견했습니다", 
-                service.getProviderName(), 
-                actualModelIds.size());
+        if (verboseLogging) {
+            log.info("[{}] API에서 {} 개의 모델을 발견했습니다", 
+                    service.getProviderName(), 
+                    actualModelIds.size());
+        }
         
         for (ModelInfo model : definedModels) {
             boolean exists = actualModelIds.stream()
                     .anyMatch(id -> id.contains(model.getId()) || model.getId().contains(id));
             
-            if (exists) {
-                log.info("[{}] ✓ 모델 확인됨: {}", service.getProviderName(), model.getId());
-            } else {
-                log.warn("[{}] ✗ 모델 미확인: {} - API에 존재하지 않을 수 있습니다", 
-                        service.getProviderName(), 
-                        model.getId());
+            if (verboseLogging) {
+                if (exists) {
+                    log.info("[{}] ✓ 모델 확인됨: {}", service.getProviderName(), model.getId());
+                } else {
+                    log.warn("[{}] ✗ 모델 미확인: {} - API에 존재하지 않을 수 있습니다", 
+                            service.getProviderName(), 
+                            model.getId());
+                }
+            } else if (!exists) {
+                log.warn("[{}] ✗ 모델 미확인: {}", service.getProviderName(), model.getId());
             }
         }
     }

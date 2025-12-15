@@ -3,6 +3,7 @@ package com.example.demo.service;
 import com.example.demo.exception.ModelNotSupportedException;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -16,6 +17,9 @@ public class AIServiceFactory {
     
     private final Map<String, AIService> servicesByProvider;
     private final Map<String, AIService> servicesByModel;
+    
+    @Value("${ai.model.logging.enabled:false}")
+    private boolean loggingEnabled;
     
     public AIServiceFactory(List<AIService> aiServices) {
         this.servicesByProvider = aiServices.stream()
@@ -35,6 +39,10 @@ public class AIServiceFactory {
     
     @PostConstruct
     public void printAvailableModels() {
+        if (!loggingEnabled) {
+            return;
+        }
+        
         log.info("=".repeat(80));
         log.info("등록된 AI 모델 목록:");
         log.info("=".repeat(80));
