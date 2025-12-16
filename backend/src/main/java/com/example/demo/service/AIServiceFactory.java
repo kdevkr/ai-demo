@@ -2,8 +2,8 @@ package com.example.demo.service;
 
 import com.example.demo.config.properties.AIModelProperties;
 import com.example.demo.exception.ModelNotSupportedException;
+import com.example.demo.model.ModelInfo;
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class AIServiceFactory {
     
     private final Map<String, AIService> servicesByProvider;
@@ -50,8 +49,8 @@ public class AIServiceFactory {
         
         servicesByProvider.forEach((provider, service) -> {
             List<String> modelIds = service.getAvailableModels().stream()
-                    .map(model -> model.getId())
-                    .collect(Collectors.toList());
+                    .map(ModelInfo::getId)
+                    .toList();
             log.info("[{}] {} 개 모델: {}", provider, modelIds.size(), String.join(", ", modelIds));
         });
         
